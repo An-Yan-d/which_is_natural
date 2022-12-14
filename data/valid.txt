@@ -1,0 +1,2 @@
+data/valid/0_natural/2-4.png 0
+data/valid/1_artificial/1-2.png 1

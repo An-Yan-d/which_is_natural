@@ -1,0 +1,13 @@
+data/train/0_natural/2-1.png 0
+data/train/0_natural/2-3.png 0
+data/train/0_natural/2-2.png 0
+data/train/0_natural/1-1.png 0
+data/train/0_natural/1-2.png 0
+data/train/0_natural/1-3.png 0
+data/train/1_artificial/1-1-scale.png 1
+data/train/1_artificial/2-1.png 1
+data/train/1_artificial/2-3.png 1
+data/train/1_artificial/2-2.png 1
+data/train/1_artificial/2-4.png 1
+data/train/1_artificial/1-1.png 1
+data/train/1_artificial/1-4.png 1
