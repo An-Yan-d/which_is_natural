@@ -2,12 +2,13 @@ import os
 import torch
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
 
 from waterBodyDataSet import WaterBodyDataSet
 from model import WBNET
 
 
-def train(dataloader,model,epochs,lr=1e-4):
+def train(dataloader,model,epochs,device,SAVEPATH,lr=1e-4):
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     losslist=[]
@@ -19,7 +20,7 @@ def train(dataloader,model,epochs,lr=1e-4):
             # get the inputs
             inputs, labels = data  # data是从enumerate返回的data，包含数据和标签信息，分别赋值给inputs和labels
             # wrap them in Variable
-            inputs, labels = Variable(inputs), Variable(labels)  # 转换数据格式用Variable
+            inputs, labels = Variable(inputs).to(device), Variable(labels).to(device) # 转换数据格式用Variable
             optimizer.zero_grad()  # 梯度置零，因为反向传播过程中梯度会累加上一次循环的梯度
             # forward + backward + optimize
             outputs = model(inputs)  # 把数据输进CNN网络net
@@ -32,35 +33,38 @@ def train(dataloader,model,epochs,lr=1e-4):
             running_loss += losssum  # loss累加
             # 加入参数
             # writer.add_histogram("Param/weight",outputs.weight,epoch)
-            if i % 50 == 0:
+            if (i+1) % 50 == 0:
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 50))  # 然后再除以200，就得到这两百次的平均损失值
                 losslist.append(running_loss)
                 running_loss = 0.0  # 这一个200次结束后，就把running_loss归零，下一个200次继续使用
+        if (epoch)%50==0:
+            save(SAVEPATH, model,str(epoch))
     print('Finished Training')
     return losslist
 
-def save(SAVEPATH,model):
+def save(SAVEPATH,model,name):
     # 保存神经网络,一种类型是保存参数，一种类型为保存模型
-    savemodelname = 'net.pkl'
-    savemodelname_params = 'net_params.pkl'
-    savepath1 = SAVEPATH + savemodelname
-    savepath2 = SAVEPATH + savemodelname_params
+    savemodelname = name+'net.pkl'
+    savemodelname_params = name+'net_params.pkl'
+    savepath1 = os.path.join(SAVEPATH , savemodelname)
+    savepath2 = os.path.join(SAVEPATH , savemodelname_params)
 
     torch.save(model, savepath1)  # 保存整个神经网络的结构和模型参数
     torch.save(model.state_dict(), savepath2)  # 只保存神经网络的模型参数
+    print('Save complete')
 
 if __name__ == '__main__':
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     # initialize the neural network
-    model = WBNET()
+    model = WBNET().to(device)
 
-    test_dir = os.path.join("data", "test.txt")
     train_dir = os.path.join("data", "train.txt")
     dataset=WaterBodyDataSet(train_dir)
     dataloader=DataLoader(dataset,batch_size=2)
-    train(dataloader,model,500)
+    his=train(dataloader,model,500,device,'model')
 
-    testdataloader=DataLoader(WaterBodyDataSet(test_dir))
-    for d in testdataloader:
-        inputs, labels = d
-        print(model.predict(inputs),labels)
+    plt.figure()
+    plt.plot(his)
+    plt.show()
+
+    save('model',model,'final')

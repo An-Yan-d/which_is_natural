@@ -8,9 +8,9 @@ train_dir = os.path.join( "data", "train")
 valid_dir = os.path.join("data", "valid")
 test_dir = os.path.join("data", "test")
 
-train_per = 0.8
-valid_per = 0.1
-test_per = 0.1
+train_per = 0.85
+valid_per = 0
+test_per = 0.15
 
 
 def makedir(new_dir):
