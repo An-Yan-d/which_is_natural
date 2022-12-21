@@ -25,8 +25,6 @@ def test(model,testloader):
     # %5s中的5表示占位5个字符
     # print('GroundTruth: ' , " ".join('%5s' % objectclass.class_names[labels[j]] for j in range(25)))  # 打印前25个GT（test集里图片的标签）
     outputs = model(Variable(images))
-    print(outputs)
-    print(labels)
     _, predicted = torch.max(outputs.data, 1)
     # 获取分类的预测分数
     sum_score = outputs.data.numpy()
@@ -62,6 +60,6 @@ if __name__ == "__main__":
 
     test_dir = os.path.join("data", "test.txt")
     dataset = WaterBodyDataSet(test_dir)
-    testloader = DataLoader(dataset, batch_size=2)
+    testloader = DataLoader(dataset, batch_size=200)
 
     test(model,testloader)
